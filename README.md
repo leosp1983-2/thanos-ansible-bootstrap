@@ -13,3 +13,8 @@ This will spawn up 2 instances of the "Backend" Part which consists of ONE Prome
 
 This will also spawn up 1 instance of the "Frontend" part which consists of ONE minio S3 storage image and ONE thanos query frontend.
 
+
+
+ansible-playbook down.yml
+
+This will kill all running instances via docker-compose down
