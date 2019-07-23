@@ -1,0 +1,33 @@
+version: '3'
+services:
+  query:
+    build: ./Thanos
+    restart: always
+    command: /usr/bin/thanos query --http-address 0.0.0.0:{{query_http_port}} --grpc-address 0.0.0.0:{{query_grpc_port}} {{store}} --query.replica-label replica
+    ports:
+      - '{{query_http_port}}:{{query_http_port}}'
+      - '{{query_grpc_port}}:{{query_grpc_port}}'
+    expose:
+      - '{{query_grpc_port}}'
+      - '{{query_http_port}}'
+  minio:
+    image: minio/minio
+    restart: always
+    environment:
+        MINIO_ACCESS_KEY: {{minio_access_key}}
+        MINIO_SECRET_KEY: {{minio_secret_key}}
+    command: server /data
+    ports:
+      - '{{minio_port}}:{{minio_port}}'
+    expose:
+      - '{{minio_port}}'
+    volumes:
+      - minio-data:/data
+  minio_mc:
+    image: minio/mc
+    entrypoint: sh
+    command: -c "mc config host add minio http://minio:9000 {{minio_access_key}} {{minio_secret_key}} --api S3v4 && mc mb {{buckets}}"
+    depends_on:
+      - minio
+volumes:
+  minio-data:

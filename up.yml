@@ -1,0 +1,34 @@
+---
+
+- hosts: stored.cc
+  vars:
+    instance: thanos01
+    prometheus:
+      region: "stored.cc"
+      purpose: "IoT"
+      replica: "A"
+    sidecar_http_port: 19192
+    sidecar_grpc_port: 19092
+  roles:
+   - prometheus_thanos_backend
+
+- hosts: stored.cc
+  vars:
+    instance: thanos02
+    prometheus:
+      region: "stored.cc"
+      purpose: "IoT"
+      replica: "B"
+
+    sidecar_http_port: 19193
+    sidecar_grpc_port: 19093
+  roles:
+    - prometheus_thanos_backend
+
+- hosts: stored.cc
+  vars:
+    instance: thanos03
+    query_http_port: 19194
+    query_grpc_port: 19094
+  roles:
+    - prometheus_thanos_frontend

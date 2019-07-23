@@ -1,0 +1,76 @@
+---
+
+  - name: Create {{base_dir}}
+    file:
+      path: "{{base_dir}}"
+      state: directory
+      mode: '777'
+
+  - name: Create {{base_dir}}/{{instance}}
+    file:
+      path: "{{base_dir}}/{{instance}}"
+      state: directory
+      mode: '777'
+
+  - name: Create {{base_dir}}/{{instance}}/Prometheus
+    file:
+      path: "{{base_dir}}/{{instance}}/Prometheus"
+      state: directory
+      mode: '777'
+
+  - name: Create {{base_dir}}/{{instance}}/Thanos
+    file:
+      path: "{{base_dir}}/{{instance}}/Thanos"
+      state: directory
+      mode: '777'
+
+  - name: Template {{base_dir}}/{{instance}}/prometheus.yml
+    template:
+      src: templates/prometheus.yml.j2
+      dest: "{{base_dir}}/{{instance}}/prometheus.yml"
+      owner: root
+      group: root
+      mode: 0744
+
+  - name: Template {{base_dir}}/{{instance}}/Prometheus/Dockerfile
+    template:
+      src: templates/Prometheus/Dockerfile.j2
+      dest: "{{base_dir}}/{{instance}}/Prometheus/Dockerfile"
+      owner: root
+      group: root
+      mode: 0744
+
+  - name: Template {{base_dir}}/{{instance}}/Thanos/Dockerfile
+    template:
+      src: templates/Thanos/Dockerfile.j2
+      dest: "{{base_dir}}/{{instance}}/Thanos/Dockerfile"
+      owner: root
+      group: root
+      mode: 0744
+
+  - name: Template {{base_dir}}/{{instance}}/docker-compose.yml
+    template:
+      src: templates/docker-compose.yml.j2
+      dest: "{{base_dir}}/{{instance}}/docker-compose.yml"
+      owner: root
+      group: root
+      mode: 0744
+
+  - name: Template {{base_dir}}/{{instance}}/s3.yml
+    template:
+      src: templates/s3.yml.j2
+      dest: "{{base_dir}}/{{instance}}/s3.yml"
+      owner: root
+      group: root
+      mode: 0744
+
+  - name: Append current backend to --store parameter
+    set_fact:
+      store: "{{store}} --store {{inventory_hostname}}:{{sidecar_grpc_port}}"
+
+  - name: Append current instance to buckets (We will need to create them later)
+    set_fact:
+      buckets: "{{buckets}} minio/{{instance}}"
+
+  - name: Exec docker-compose up -d {{base_dir}}/{{instance}}
+    shell: cd {{base_dir}}/{{instance}} && docker-compose up -d

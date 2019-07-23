@@ -1,0 +1,10 @@
+FROM debian:latest
+
+MAINTAINER henry@stored.cc
+
+RUN apt-get update && apt-get install -y wget
+RUN wget {{prometheus_dl_url}} -O /prometheus.tar.gz
+RUN cd / && tar -xvf prometheus.tar.gz
+RUN rm -f /prometheus.tar.gz
+RUN cd / && mv /prometheus-*/prometheus /usr/bin/prometheus
+RUN rm -rf /prometheus*

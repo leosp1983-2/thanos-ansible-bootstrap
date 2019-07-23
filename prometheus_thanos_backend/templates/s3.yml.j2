@@ -1,0 +1,17 @@
+type: S3
+config:
+  bucket: "{{instance}}"
+  endpoint: "{{minio_url}}:{{minio_port}}"
+  region: ""
+  access_key: "{{minio_access_key}}"
+  insecure: true #not tooo pretty, but works for now #FIX THIS :D
+  signature_version2: false
+  encrypt_sse: false
+  secret_key: "{{minio_secret_key}}"
+  put_user_metadata: {}
+  http_config:
+    idle_conn_timeout: 0s
+    response_header_timeout: 0s
+    insecure_skip_verify: false
+  trace:
+    enable: false

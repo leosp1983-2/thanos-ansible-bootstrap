@@ -1,0 +1,27 @@
+version: '3'
+services:
+  prometheus:
+    build: ./Prometheus
+    restart: always
+    command: /usr/bin/prometheus --web.listen-address="0.0.0.0:9090" --config.file="/etc/prometheus/prometheus.yml" --storage.tsdb.min-block-duration="2h" --storage.tsdb.max-block-duration="2h" --storage.tsdb.retention=2d --query.timeout=2m --web.enable-admin-api --storage.tsdb.path="/opt/prometheus_data/"
+    expose:
+      - '9009'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prom-data:/opt/prometheus_data
+  sidecar:
+    build: ./Thanos
+    restart: always
+    command: /usr/bin/thanos sidecar --prometheus.url "http://prometheus:9090" --objstore.config-file /opt/s3.yml --grpc-address 0.0.0.0:{{sidecar_grpc_port}} --http-address 0.0.0.0:{{sidecar_http_port}} --tsdb.path /opt/prometheus_data
+    ports:
+      - '{{sidecar_grpc_port}}:{{sidecar_grpc_port}}'
+      - '{{sidecar_http_port}}:{{sidecar_http_port}}'
+    expose:
+      - '{{sidecar_grpc_port}}'
+      - '{{sidecar_http_port}}'
+    volumes:
+      - prom-data:/opt/prometheus_data
+      - ./s3.yml:/opt/s3.yml
+
+volumes:
+  prom-data:

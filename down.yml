@@ -1,0 +1,19 @@
+---
+
+- hosts: stored.cc
+  vars:
+    instance: thanos01
+  tasks:
+    - shell: "cd {{base_dir}}/{{instance}} && docker-compose down --remove-orphans"
+
+- hosts: stored.cc
+  vars:
+    instance: thanos02
+  tasks:
+    - shell: "cd {{base_dir}}/{{instance}} && docker-compose down --remove-orphans"
+
+- hosts: stored.cc
+  vars:
+    instance: thanos03
+  tasks:
+    - shell: "cd {{base_dir}}/{{instance}} && docker-compose down --remove-orphans"
